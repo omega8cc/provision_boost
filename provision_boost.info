@@ -1,0 +1,6 @@
+name = Provision Boost
+description = Boost configuration for Aegir platforms
+package = Provision
+dependencies[] = drush
+
+core = 6.x
