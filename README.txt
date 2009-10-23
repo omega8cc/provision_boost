@@ -21,6 +21,10 @@ Site example:
 
 cd drupal-6.14 ; drush provision verify --site_boost=1
 
+The argument to site or platform_boost determines which boost rewrite rules
+will be included in the Apache configuration. If you are running a multisite
+install, you probably want type 2 instead of type 1.
+
 Caveats
 -------
 
