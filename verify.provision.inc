@@ -39,8 +39,8 @@ function provision_boost_provision_apache_vhost_config($data = null) {
  * Inject the relevant Apache configuration into the global apache configuration
  */
 function provision_boost_provision_apache_dir_config($data = null) {
-  if (drush_get_option('platform_boost')) {
-    return file_get_contents(dirname(__FILE__) . "/boosted1.txt");
+  if ($version = drush_get_option('platform_boost') && is_numeric($version)) {
+    return file_get_contents(dirname(__FILE__) . "/boosted$version.txt");
   }
 }
 
