@@ -12,7 +12,7 @@ function drush_provision_boost_provision_verify($url = null) {
         dt("Could not create <code>@path</code>"),
         'DRUSH_PERM_ERROR');
     }
-    provision_path("chmod_recursive", "cache", 0770, 
+    provision_path("chmod", "cache", 0770, 
       dt("Changed permissions of <code>@path</code> to @confirm"),
       dt("Could not change permissions <code>@path</code> to @confirm"),
       'DRUSH_PERM_ERROR');
