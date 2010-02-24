@@ -30,8 +30,8 @@ function drush_provision_boost_provision_verify($url = null) {
  * Inject the relevant Apache configuration in the site vhost
  */
 function provision_boost_provision_apache_vhost_config($data = null) {
-  if (drush_get_option('site_boost')) {
-    return file_get_contents(__FILE__ . "/boosted1.txt");
+  if (($version = drush_get_option('site_boost')) && is_numeric($version)) {
+    return file_get_contents(dirname(__FILE__) . "/boosted1.txt");
   }
 }
 
