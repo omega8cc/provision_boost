@@ -4,25 +4,26 @@
  * implementation of provision_verify
  */
 function drush_provision_boost_provision_verify($url = null) {
-  if (PROVISION_CONTEXT_PLATFORM && drush_get_option('boost')) {
-    drush_log(dt("configuring platform for boost support"));
-    if (!is_dir("cache")) {
-      provision_path("mkdir", "cache", TRUE, 
+  if (drush_get_option('boost')) {
+    if (PROVISION_CONTEXT_PLATFORM) {
+      drush_log(dt("configuring platform for boost support"));
+    } elseif (PROVISION_CONTEXT_SITE) {
+      drush_log(dt("configuring site for boost support"));
+    }
+    $cache_path = drush_get_option('docroot_path') . "/cache";
+    if (!is_dir($cache_path)) {
+      provision_path("mkdir", $cache_path, TRUE, 
         dt("Created <code>@path</code>"),
         dt("Could not create <code>@path</code>"),
         'DRUSH_PERM_ERROR');
     }
-    provision_path("chmod", "cache", 0770, 
+    provision_path("chmod", $cache_path, 0770, 
       dt("Changed permissions of <code>@path</code> to @confirm"),
       dt("Could not change permissions <code>@path</code> to @confirm"),
       'DRUSH_PERM_ERROR');
-    provision_path("chgrp", "cache", drush_get_option('web_group'),
+    provision_path("chgrp", $cache_path, drush_get_option('web_group'),
       dt('Change group ownership of settings.php to @confirm'),
       dt('Could not change group ownership of settings.php to @confirm'));
-  } elseif (PROVISION_CONTEXT_SITE && drush_get_option('boost')) {
-    # nothing to do here (yet?)
-    # we still log this because we add config settings to the vhost (below)
-    drush_log(dt("configuring site for boost support"));
   }
 }
 
