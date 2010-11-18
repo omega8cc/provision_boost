@@ -4,26 +4,32 @@
  * implementation of provision_verify
  */
 function drush_provision_boost_provision_verify($url = null) {
-  if (drush_get_option('boost')) {
-    if (PROVISION_CONTEXT_PLATFORM) {
-      drush_log(dt("configuring platform for boost support"));
-    } elseif (PROVISION_CONTEXT_SITE) {
+  // TODO: support platform?
+  if (d()->type == 'site') {
+    $config = new provisionConfig_drushrc_site(d()->name);
+
+    if ($config->data['packages']['modules']['boost']['status'] == 1) {
       drush_log(dt("configuring site for boost support"));
+
+      $cache_path = d()->root . '/cache';
+
+      if (!is_dir($cache_path)) {
+        provision_file()->mkdir($cache_path . '/normal/' . $url)
+          ->succeed('Created <code>@path</code>')
+          ->fail('Could not create <code>@path</code>')
+          ->status();
+      }
+
+      provision_file()->chmod($cache_path, 0770, TRUE)
+        ->succeed('Changed permissions of <code>@path</code> to @perm')
+        ->fail('Could not change permissions <code>@path</code> to @perm')
+        ->status();
+
+      provision_file()->chgrp($cache_path, d('@server_master')->web_group, TRUE)
+        ->succeed('Change group ownership of settings.php to @path')
+        ->fail('Could not change group ownership of settings.php to @path')
+        ->status();
     }
-    $cache_path = drush_get_option('docroot_path') . "/cache";
-    if (!is_dir($cache_path)) {
-      provision_path("mkdir", $cache_path, TRUE, 
-        dt("Created <code>@path</code>"),
-        dt("Could not create <code>@path</code>"),
-        'DRUSH_PERM_ERROR');
-    }
-    provision_path("chmod", $cache_path, 0770, 
-      dt("Changed permissions of <code>@path</code> to @confirm"),
-      dt("Could not change permissions <code>@path</code> to @confirm"),
-      'DRUSH_PERM_ERROR');
-    provision_path("chgrp", $cache_path, drush_get_option('web_group'),
-      dt('Change group ownership of settings.php to @confirm'),
-      dt('Could not change group ownership of settings.php to @confirm'));
   }
 }
 
@@ -31,7 +37,9 @@ function drush_provision_boost_provision_verify($url = null) {
  * Inject the relevant Apache configuration in the site vhost
  */
 function provision_boost_provision_apache_vhost_config($data = null) {
-  if (($version = drush_get_option('boost')) && is_numeric($version)) {
+  $config = new provisionConfig_drushrc_site(d()->name);
+
+  if ($config->data['packages']['modules']['boost']['status'] == 1) {
     return file_get_contents(dirname(__FILE__) . "/boosted1.txt");
   }
 }
@@ -49,9 +57,14 @@ function provision_boost_provision_apache_dir_config($data = null) {
  * Persist boost settings in the drushrc.php
  */
 function drush_provision_boost_post_provision_verify($url = NULL) {
-  if (PROVISION_CONTEXT_SITE) {
-    drush_set_option('boost', drush_get_option('boost'), 'site');
-  } elseif (PROVISION_CONTEXT_PLATFORM) {
+  if (d()->type == 'site') {
+    /* drush_set_option('boost', drush_get_option('boost'), 'site');
+    $config = new provisionConfig_drushrc_site(d()->name);
+    drush_log(dt("config = " . print_r($config, 1)));
+    $config->data['boost'] = 1;
+    $config->write();
+    */
+  } elseif (d()->type == 'platform') {
     drush_set_option('boost', drush_get_option('boost'), 'drupal');
   }
 }
