@@ -72,6 +72,13 @@ function drush_provision_boost_post_provision_verify($url = NULL) {
     $config->data['boost'] = 1;
     $config->write();
     */
+
+    $config = new provisionConfig_drushrc_site(d()->name);
+
+    if ($config->data['packages']['modules']['boost']['status'] == 1) {
+      boost_cache_clear_all();
+      drush_log(dt('boost: Flushed ALL files from static page cache.'));
+    }
   } elseif (d()->type == 'platform') {
     drush_set_option('boost', drush_get_option('boost'), 'drupal');
   }
