@@ -40,6 +40,14 @@ function provision_boost_provision_apache_vhost_config($data = null) {
   $config = new provisionConfig_drushrc_site(d()->name);
 
   if ($config->data['packages']['modules']['boost']['status'] == 1) {
+    module_load_include('inc', 'boost', 'boost.admin');
+
+    $host = variable_get('boost_server_name_http_host', '%{SERVER_NAME}');
+    $root = variable_get('boost_document_root', '%{DOCUMENT_ROOT}');
+
+    $htaccess = boost_admin_generate_htaccess($host, $root);
+
+    // return "RewriteEngine on\n" . $htaccess . "\n";
     return file_get_contents(dirname(__FILE__) . "/boosted1.txt");
   }
 }
@@ -64,6 +72,13 @@ function drush_provision_boost_post_provision_verify($url = NULL) {
     $config->data['boost'] = 1;
     $config->write();
     */
+
+    $config = new provisionConfig_drushrc_site(d()->name);
+
+    if ($config->data['packages']['modules']['boost']['status'] == 1) {
+      boost_cache_clear_all();
+      drush_log(dt('boost: Flushed ALL files from static page cache.'));
+    }
   } elseif (d()->type == 'platform') {
     drush_set_option('boost', drush_get_option('boost'), 'drupal');
   }
