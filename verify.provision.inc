@@ -8,7 +8,7 @@ function drush_provision_boost_provision_verify($url = null) {
   if (d()->type == 'site') {
     $config = new provisionConfig_drushrc_site(d()->name);
 
-    if ($config->data['packages']['modules']['boost']['status'] == 1) {
+    if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
       drush_log(dt("configuring site for boost support"));
 
       $cache_path = d()->root . '/cache';
@@ -39,7 +39,7 @@ function drush_provision_boost_provision_verify($url = null) {
 function provision_boost_provision_apache_vhost_config($data = null) {
   $config = new provisionConfig_drushrc_site(d()->name);
 
-  if ($config->data['packages']['modules']['boost']['status'] == 1) {
+  if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
     module_load_include('inc', 'boost', 'boost.admin');
 
     $host = variable_get('boost_server_name_http_host', '%{SERVER_NAME}');
@@ -75,7 +75,7 @@ function drush_provision_boost_post_provision_verify($url = NULL) {
 
     $config = new provisionConfig_drushrc_site(d()->name);
 
-    if ($config->data['packages']['modules']['boost']['status'] == 1) {
+    if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
       boost_cache_clear_all();
       drush_log(dt('boost: Flushed ALL files from static page cache.'));
     }
