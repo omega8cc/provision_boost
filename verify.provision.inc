@@ -76,8 +76,19 @@ function drush_provision_boost_post_provision_verify($url = NULL) {
     $config = new provisionConfig_drushrc_site(d()->name);
 
     if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
-      boost_cache_clear_all();
-      drush_log(dt('boost: Flushed ALL files from static page cache.'));
+      // copied from boost.admin.inc function boost_reset_database_file_submit()
+      // see also: http://drupal.org/node/944684
+      $GLOBALS['conf']['boost_ignore_flush'] = 0;
+      if (boost_cache_clear_all()) {
+        db_query("TRUNCATE {boost_cache}");
+        db_query("TRUNCATE {boost_cache_settings}");
+        db_query("TRUNCATE {boost_cache_relationships}");
+        db_query("TRUNCATE {boost_crawler}");
+        _boost_rmdir_rf(BOOST_PERM_FILE_PATH, TRUE, TRUE, TRUE);
+        drush_log(dt('boost: Flushed ALL files from static page cache.'));
+      } else {
+        drush_log(dt('boost: could NOT flush the cache, boost_cache_clear_all() mysteriously returned FALSE.'));
+      }
     }
   } elseif (d()->type == 'platform') {
     drush_set_option('boost', drush_get_option('boost'), 'drupal');
