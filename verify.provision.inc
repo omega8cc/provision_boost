@@ -9,7 +9,7 @@ function drush_provision_boost_provision_verify($url = null) {
     $config = new provisionConfig_drushrc_site(d()->name);
 
     if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
-      drush_log(dt("configuring site for boost support"));
+      drush_log(dt("Boost: configuring site for boost support"));
 
       $cache_path = d()->root . '/cache';
 
@@ -21,13 +21,13 @@ function drush_provision_boost_provision_verify($url = null) {
       }
 
       provision_file()->chmod($cache_path, 0770, TRUE)
-        ->succeed('Changed permissions of <code>@path</code> to @perm')
-        ->fail('Could not change permissions <code>@path</code> to @perm')
+        ->succeed('Boost: Changed permissions of <code>@path</code> to @perm')
+        ->fail('Boost: Could not change permissions <code>@path</code> to @perm')
         ->status();
 
       provision_file()->chgrp($cache_path, d('@server_master')->web_group, TRUE)
-        ->succeed('Change group ownership of settings.php to @path')
-        ->fail('Could not change group ownership of settings.php to @path')
+        ->succeed('Boost: Change group ownership of settings.php to @path')
+        ->fail('Boost: Could not change group ownership of settings.php to @path')
         ->status();
     }
   }
@@ -91,9 +91,9 @@ function drush_provision_boost_post_provision_verify($url = NULL) {
           db_query("TRUNCATE {boost_cache_relationships}");
           db_query("TRUNCATE {boost_crawler}");
           _boost_rmdir_rf(BOOST_PERM_FILE_PATH, TRUE, TRUE, TRUE);
-          drush_log(dt('boost: Flushed ALL files from static page cache.'));
+          drush_log(dt('Boost: Flushed ALL files from static page cache.'));
         } else {
-          drush_log(dt('boost: could NOT flush the cache, boost_cache_clear_all() mysteriously returned FALSE.'));
+          drush_log(dt('Boost: could NOT flush the cache, boost_cache_clear_all() mysteriously returned FALSE.'));
         }
       }
     }
