@@ -40,14 +40,23 @@ function provision_boost_provision_apache_vhost_config($data = null) {
   $config = new provisionConfig_drushrc_site(d()->name);
 
   if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
+/* 
+   Cannot do this because we cannot trust the code.
+   In some hosting environments, if the user can modify/upload modules,
+   then they can modify boost_admin_generate_htaccess() to inject their
+   own custom code in the vhost, which would be a big security issue.
+   A solution might be to copy the code of that function from boost..
+   but that means more effort to maintain it and keep it in sync.
+
     module_load_include('inc', 'boost', 'boost.admin');
 
     $host = variable_get('boost_server_name_http_host', '%{SERVER_NAME}');
     $root = variable_get('boost_document_root', '%{DOCUMENT_ROOT}');
 
     $htaccess = boost_admin_generate_htaccess($host, $root);
+    return "RewriteEngine on\n" . $htaccess . "\n";
+*/
 
-    // return "RewriteEngine on\n" . $htaccess . "\n";
     return file_get_contents(dirname(__FILE__) . "/boosted1.txt");
   }
 }
@@ -66,31 +75,27 @@ function provision_boost_provision_apache_dir_config($data = null) {
  */
 function drush_provision_boost_post_provision_verify($url = NULL) {
   if (d()->type == 'site') {
-    /* drush_set_option('boost', drush_get_option('boost'), 'site');
-    $config = new provisionConfig_drushrc_site(d()->name);
-    drush_log(dt("config = " . print_r($config, 1)));
-    $config->data['boost'] = 1;
-    $config->write();
-    */
-
     $config = new provisionConfig_drushrc_site(d()->name);
 
     if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
-      // copied from boost.admin.inc function boost_reset_database_file_submit()
-      // see also: http://drupal.org/node/944684
-      $GLOBALS['conf']['boost_ignore_flush'] = 0;
-      if (boost_cache_clear_all()) {
-        db_query("TRUNCATE {boost_cache}");
-        db_query("TRUNCATE {boost_cache_settings}");
-        db_query("TRUNCATE {boost_cache_relationships}");
-        db_query("TRUNCATE {boost_crawler}");
-        _boost_rmdir_rf(BOOST_PERM_FILE_PATH, TRUE, TRUE, TRUE);
-        drush_log(dt('boost: Flushed ALL files from static page cache.'));
-      } else {
-        drush_log(dt('boost: could NOT flush the cache, boost_cache_clear_all() mysteriously returned FALSE.'));
+      if (drush_drupal_major_version() >= 7) {
+        boost_flush_caches();
+      }
+      else {
+        // copied from boost.admin.inc function boost_reset_database_file_submit()
+        // see also: http://drupal.org/node/944684
+        $GLOBALS['conf']['boost_ignore_flush'] = 0;
+        if (boost_cache_clear_all()) {
+          db_query("TRUNCATE {boost_cache}");
+          db_query("TRUNCATE {boost_cache_settings}");
+          db_query("TRUNCATE {boost_cache_relationships}");
+          db_query("TRUNCATE {boost_crawler}");
+          _boost_rmdir_rf(BOOST_PERM_FILE_PATH, TRUE, TRUE, TRUE);
+          drush_log(dt('boost: Flushed ALL files from static page cache.'));
+        } else {
+          drush_log(dt('boost: could NOT flush the cache, boost_cache_clear_all() mysteriously returned FALSE.'));
+        }
       }
     }
-  } elseif (d()->type == 'platform') {
-    drush_set_option('boost', drush_get_option('boost'), 'drupal');
   }
 }
