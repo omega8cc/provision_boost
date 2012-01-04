@@ -12,23 +12,36 @@ function drush_provision_boost_provision_verify($url = null) {
       drush_log(dt("Boost: configuring site for boost support"));
 
       $cache_path = d()->root . '/cache';
-
       if (!is_dir($cache_path)) {
-        provision_file()->mkdir($cache_path . '/normal/' . $url)
+        provision_file()->mkdir($cache_path)
+          ->succeed('Created <code>@path</code>')
+          ->fail('Could not create <code>@path</code>')
+          ->status();
+      }
+      provision_file()->chmod($cache_path, 02770, TRUE)
+        ->succeed('Boost: Changed permissions of <code>@path</code> to @perm')
+        ->fail('Boost: Could not change permissions <code>@path</code> to @perm')
+        ->status();
+      provision_file()->chgrp($cache_path, d('@server_master')->web_group, TRUE)
+        ->succeed('Boost: Change group ownership of <code>@path</code> to @perm')
+        ->fail('Boost: Could not change group ownership of <code>@path</code> to @perm')
+        ->status();
+   
+      $cache_path_normal = d()->root . '/cache/normal/' . $url;
+      if (!is_dir($cache_path_normal)) {
+        provision_file()->mkdir($cache_path_normal)
           ->succeed('Created <code>@path</code>')
           ->fail('Could not create <code>@path</code>')
           ->status();
       }
 
-      provision_file()->chmod($cache_path, 0770, TRUE)
-        ->succeed('Boost: Changed permissions of <code>@path</code> to @perm')
-        ->fail('Boost: Could not change permissions <code>@path</code> to @perm')
-        ->status();
-
-      provision_file()->chgrp($cache_path, d('@server_master')->web_group, TRUE)
-        ->succeed('Boost: Change group ownership of settings.php to @path')
-        ->fail('Boost: Could not change group ownership of settings.php to @path')
-        ->status();
+      $cache_path_perm = d()->root . '/cache/perm/' . $url;
+      if (!is_dir($cache_path_perm)) {
+        provision_file()->mkdir($cache_path_perm . '/perm/' . $url)
+          ->succeed('Created <code>@path</code>')
+          ->fail('Could not create <code>@path</code>')
+          ->status();
+      }
     }
   }
 }
