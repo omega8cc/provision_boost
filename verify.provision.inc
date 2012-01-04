@@ -6,7 +6,7 @@
 function drush_provision_boost_provision_verify($url = null) {
   // TODO: support platform?
   if (d()->type == 'site') {
-    $config = new provisionConfig_drushrc_site(d()->name);
+    $config = new Provision_Config_Drushrc_Site(d()->name);
 
     if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
       drush_log(dt("Boost: configuring site for boost support"));
@@ -37,7 +37,7 @@ function drush_provision_boost_provision_verify($url = null) {
  * Inject the relevant Apache configuration in the site vhost
  */
 function provision_boost_provision_apache_vhost_config($data = null) {
-  $config = new provisionConfig_drushrc_site(d()->name);
+  $config = new Provision_Config_Drushrc_Site(d()->name);
 
   if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
 /* 
@@ -75,7 +75,7 @@ function provision_boost_provision_apache_dir_config($data = null) {
  */
 function drush_provision_boost_post_provision_verify($url = NULL) {
   if (d()->type == 'site') {
-    $config = new provisionConfig_drushrc_site(d()->name);
+    $config = new Provision_Config_Drushrc_Site(d()->name);
 
     if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
       if (drush_drupal_major_version() >= 7) {
