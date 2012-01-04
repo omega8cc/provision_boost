@@ -7,6 +7,7 @@ function drush_provision_boost_provision_verify($url = null) {
   // TODO: support platform?
   if (d()->type == 'site') {
     $config = new Provision_Config_Drushrc_Site(d()->name);
+    $url = d()->uri;
 
     if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
       drush_log(dt("Boost: configuring site for boost support"));
@@ -23,8 +24,8 @@ function drush_provision_boost_provision_verify($url = null) {
         ->fail('Boost: Could not change permissions <code>@path</code> to @perm')
         ->status();
       provision_file()->chgrp($cache_path, d('@server_master')->web_group, TRUE)
-        ->succeed('Boost: Change group ownership of <code>@path</code> to @perm')
-        ->fail('Boost: Could not change group ownership of <code>@path</code> to @perm')
+        ->succeed('Boost: Change group ownership of <code>@path</code> to @gid')
+        ->fail('Boost: Could not change group ownership of <code>@path</code> to @gid')
         ->status();
    
       $cache_path_normal = d()->root . '/cache/normal/' . $url;
