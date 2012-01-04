@@ -37,7 +37,31 @@ function drush_provision_boost_provision_verify($url = null) {
 
       $cache_path_perm = d()->root . '/cache/perm/' . $url;
       if (!is_dir($cache_path_perm)) {
-        provision_file()->mkdir($cache_path_perm . '/perm/' . $url)
+        provision_file()->mkdir($cache_path_perm)
+          ->succeed('Created <code>@path</code>')
+          ->fail('Could not create <code>@path</code>')
+          ->status();
+      }
+
+      $cache_path_mobile_tablet = d()->root . '/cache/mobile-tablet/' . $url;
+      if (!is_dir($cache_path_mobile_tablet)) {
+        provision_file()->mkdir($cache_path_mobile_tablet)
+          ->succeed('Created <code>@path</code>')
+          ->fail('Could not create <code>@path</code>')
+          ->status();
+      }
+
+      $cache_path_mobile_smart = d()->root . '/cache/mobile-smart/' . $url;
+      if (!is_dir($cache_path_mobile_smart)) {
+        provision_file()->mkdir($cache_path_mobile_smart)
+          ->succeed('Created <code>@path</code>')
+          ->fail('Could not create <code>@path</code>')
+          ->status();
+      }
+
+      $cache_path_mobile_other = d()->root . '/cache/mobile-other/' . $url;
+      if (!is_dir($cache_path_mobile_other)) {
+        provision_file()->mkdir($cache_path_mobile_other)
           ->succeed('Created <code>@path</code>')
           ->fail('Could not create <code>@path</code>')
           ->status();
