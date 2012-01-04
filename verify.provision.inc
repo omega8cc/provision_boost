@@ -34,6 +34,11 @@ function drush_provision_boost_provision_verify($url = null) {
           ->fail('Could not create <code>@path</code>')
           ->status();
       }
+      $cache_path_normal_dot = $cache_path_normal . '/.boost';
+      provision_file()->chgrp($cache_path_normal_dot, d('@server_master')->web_group, TRUE)
+        ->succeed('Boost: Change group ownership of <code>@path</code> to @perm')
+        ->fail('Boost: Could not change group ownership of <code>@path</code> to @perm')
+        ->status();
 
       $cache_path_perm = d()->root . '/cache/perm/' . $url;
       if (!is_dir($cache_path_perm)) {
@@ -42,6 +47,11 @@ function drush_provision_boost_provision_verify($url = null) {
           ->fail('Could not create <code>@path</code>')
           ->status();
       }
+      $cache_path_perm_dot = $cache_path_perm . '/.boost';
+      provision_file()->chgrp($cache_path_perm_dot, d('@server_master')->web_group, TRUE)
+        ->succeed('Boost: Change group ownership of <code>@path</code> to @perm')
+        ->fail('Boost: Could not change group ownership of <code>@path</code> to @perm')
+        ->status();
 
       $cache_path_mobile_tablet = d()->root . '/cache/mobile-tablet/' . $url;
       if (!is_dir($cache_path_mobile_tablet)) {
