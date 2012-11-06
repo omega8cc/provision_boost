@@ -8,31 +8,37 @@ function drush_provision_boost_provision_verify($url = null) {
   if (d()->type == 'site') {
     $config = new Provision_Config_Drushrc_Site(d()->name);
     $url = d()->uri;
-
     if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
-      drush_log(dt("Boost: configuring site for boost support"));
-
       $cache_path = d()->root . '/cache';
       if (!is_dir($cache_path)) {
+        drush_log(dt("Boost: configuring site for boost support"));
         provision_file()->mkdir($cache_path)
           ->succeed('Created <code>@path</code>')
           ->fail('Could not create <code>@path</code>')
           ->status();
+        provision_file()->chmod($cache_path, 02770, TRUE)
+          ->succeed('Boost: Changed permissions of <code>@path</code> to @perm')
+          ->fail('Boost: Could not change permissions <code>@path</code> to @perm')
+          ->status();
+        provision_file()->chgrp($cache_path, d('@server_master')->web_group, TRUE)
+          ->succeed('Boost: Change group ownership of <code>@path</code> to @gid')
+          ->fail('Boost: Could not change group ownership of <code>@path</code> to @gid')
+          ->status();
       }
-      provision_file()->chmod($cache_path, 02770, TRUE)
-        ->succeed('Boost: Changed permissions of <code>@path</code> to @perm')
-        ->fail('Boost: Could not change permissions <code>@path</code> to @perm')
-        ->status();
-      provision_file()->chgrp($cache_path, d('@server_master')->web_group, TRUE)
-        ->succeed('Boost: Change group ownership of <code>@path</code> to @gid')
-        ->fail('Boost: Could not change group ownership of <code>@path</code> to @gid')
-        ->status();
 
       $cache_path_normal = d()->root . '/cache/normal/' . $url;
       if (!is_dir($cache_path_normal)) {
         provision_file()->mkdir($cache_path_normal)
           ->succeed('Created <code>@path</code>')
           ->fail('Could not create <code>@path</code>')
+          ->status();
+        provision_file()->chmod($cache_path_normal, 02770, TRUE)
+          ->succeed('Boost: Changed permissions of <code>@path</code> to @perm')
+          ->fail('Boost: Could not change permissions <code>@path</code> to @perm')
+          ->status();
+        provision_file()->chgrp($cache_path_normal, d('@server_master')->web_group, TRUE)
+          ->succeed('Boost: Change group ownership of <code>@path</code> to @gid')
+          ->fail('Boost: Could not change group ownership of <code>@path</code> to @gid')
           ->status();
       }
 
@@ -41,6 +47,14 @@ function drush_provision_boost_provision_verify($url = null) {
         provision_file()->mkdir($cache_path_perm)
           ->succeed('Created <code>@path</code>')
           ->fail('Could not create <code>@path</code>')
+          ->status();
+        provision_file()->chmod($cache_path_perm, 02770, TRUE)
+          ->succeed('Boost: Changed permissions of <code>@path</code> to @perm')
+          ->fail('Boost: Could not change permissions <code>@path</code> to @perm')
+          ->status();
+        provision_file()->chgrp($cache_path_perm, d('@server_master')->web_group, TRUE)
+          ->succeed('Boost: Change group ownership of <code>@path</code> to @gid')
+          ->fail('Boost: Could not change group ownership of <code>@path</code> to @gid')
           ->status();
       }
     }
