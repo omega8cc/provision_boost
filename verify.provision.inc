@@ -27,7 +27,7 @@ function drush_provision_boost_provision_verify($url = null) {
         ->succeed('Boost: Change group ownership of <code>@path</code> to @gid')
         ->fail('Boost: Could not change group ownership of <code>@path</code> to @gid')
         ->status();
-   
+
       $cache_path_normal = d()->root . '/cache/normal/' . $url;
       if (!is_dir($cache_path_normal)) {
         provision_file()->mkdir($cache_path_normal)
@@ -43,30 +43,6 @@ function drush_provision_boost_provision_verify($url = null) {
           ->fail('Could not create <code>@path</code>')
           ->status();
       }
-
-      $cache_path_mobile_tablet = d()->root . '/cache/mobile-tablet/' . $url;
-      if (!is_dir($cache_path_mobile_tablet)) {
-        provision_file()->mkdir($cache_path_mobile_tablet)
-          ->succeed('Created <code>@path</code>')
-          ->fail('Could not create <code>@path</code>')
-          ->status();
-      }
-
-      $cache_path_mobile_smart = d()->root . '/cache/mobile-smart/' . $url;
-      if (!is_dir($cache_path_mobile_smart)) {
-        provision_file()->mkdir($cache_path_mobile_smart)
-          ->succeed('Created <code>@path</code>')
-          ->fail('Could not create <code>@path</code>')
-          ->status();
-      }
-
-      $cache_path_mobile_other = d()->root . '/cache/mobile-other/' . $url;
-      if (!is_dir($cache_path_mobile_other)) {
-        provision_file()->mkdir($cache_path_mobile_other)
-          ->succeed('Created <code>@path</code>')
-          ->fail('Could not create <code>@path</code>')
-          ->status();
-      }
     }
   }
 }
@@ -78,7 +54,7 @@ function provision_boost_provision_apache_vhost_config($data = null) {
   $config = new Provision_Config_Drushrc_Site(d()->name);
 
   if (isset($config->data['packages']['modules']['boost']) && ($config->data['packages']['modules']['boost']['status'] == 1)) {
-/* 
+/*
    Cannot do this because we cannot trust the code.
    In some hosting environments, if the user can modify/upload modules,
    then they can modify boost_admin_generate_htaccess() to inject their
